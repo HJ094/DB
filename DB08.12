@@ -1,0 +1,129 @@
+수업 페이지 주소 to2.kr/bvH
+계정 sbsst
+비번 sbs123414
+
+예제1)
+#t1 database 생성(만약 있다면 삭제)
+DROP DATABASE IF EXISTS t1;
+CREATE DATABASE t1;
+USE t1;
+
+
+#article table 생성 (id, title, `body`)
+CREATE TABLE article(
+id INT(5) AUTO_INCREMENT,
+title CHAR(200),
+`body` TEXT,
+PRIMARY KEY(id)
+);
+#primary key로 등록하여 중복을 피하는 고유번호 등록
+#auto_increment로 자동 증가 제약 설정
+
+
+DESC article;
+
+#나머지 모든 컴럼에 not null 제약 걸기
+ALTER TABLE article MODIFY title CHAR(200) NOT NULL;
+ALTER TABLE article MODIFY `body` TEXT NOT NULL;
+
+DESC article;
+
+INSERT INTO article
+SET title = '제목1';
+
+INSERT INTO article
+SET `body` = '내용1';
+
+SELECT * FROM article;
+
+#null을 허용하는 것 보다 데이터 공간을 차지하지만, null을 잘못 사용할 경우 예기치 못한 오류가 발생 할 수 있다.
+
+#id 에 unsigned 제약 걸기
+ALTER TABLE article MODIFY id INT(5) UNSIGNED;
+
+DESC article;
+
+#작성자(writer) 칼럼을 title 칼럼 다음에 추가(칼럼의 위치를 조정하여 추가)
+ALTER TABLE article ADD writer CHAR(30) AFTER title;
+ALTER TABLE article MODIFY writer CHAR(30) NOT NULL;
+
+SELECT * FROM article;
+
+#작성자(writer) 칼럼의 이름을 nickname으로 변경
+ALTER TABLE article CHANGE writer nickname CHAR(30);
+DESC article;
+
+#nickname 칼럼 위치를 `body` 밑으로 보내주세요
+ALTER TABLE article MODIFY nickname CHAR(30) NOT NULL AFTER `body`;
+SELECT * FROM article;
+
+# hit 조회수 칼럼 추가
+ALTER TABLE article ADD hit INT(100) NOT NULL;
+SELECT * FROM article;
+
+#아래와 같이 정의 내용을 변경하는 이유는 위에
+#ALTER TABLE article MODIFY id INT(5) UNSIGNED; 구문때문이다. 이는 추가가 아닌
+#재정의되어 설정되기 때문에 auto_increment가 사라진다. 
+DELETE FROM article;
+ALTER TABLE article MODIFY id INT(5) AUTO_INCREMENT;
+
+# 테스트 데이터 추가
+
+INSERT INTO article
+SET title = '제목1',
+`body` = '내용1',
+nickname = '유저1',
+hit = 20;
+
+INSERT INTO article
+SET title = '제목2',
+`body` = '내용2',
+nickname = '유저2',
+hit = 30;
+
+INSERT INTO article
+SET title = '제목3',
+`body` = '내용3',
+nickname = '유저3',
+hit = 10;
+
+# 데이터 추가
+INSERT INTO article
+SET title = '제목4',
+`body` = '내용4',
+nickname = '유저4',
+hit = 55;
+
+# 데이터 추가
+INSERT INTO article
+SET title = '제목5',
+`body` = '내용5',
+nickname = '유저5',
+hit = 10;
+
+# 데이터 추가
+INSERT INTO article
+SET title = '제목6',
+`body` = '내용6',
+nickname = '유저6',
+hit = 100;
+
+SELECT * FROM article;
+
+
+예제2)
+# 조회수 가장 많은 게시물 3개 만 보여주세요., 힌트 : ORDER 
+SELECT * FROM article ORDER BY hit DESC LIMIT 3;
+
+# 작성자명이 '1'을 포함하는 게시물만 보여주세요., 힌트 : LIKE
+SELECT * FROM article WHERE nickname LIKE '%1%';
+# % 위치에 따라 1로 시작하는 것이나 마지막이 1로 끝나는 것을 찾는다. 양쪽 붙이면 어디든 붙은 것을 찾는다.
+
+# 조회수가 10 이상 55 이하 인것만 보여주세요., 힌트 : AND
+SELECT * FROM article WHERE hit <= 55 AND hit > 10;
+
+# 작성자가 '유저1'이 아니고 조회수가 50 이하인 것만 보여주세요., 힌트 : !=
+SELECT * FROM article WHERE nickname != '유저1' AND hit > 50;
+
+# 작성자가 '유저1' 이거나 조회수가 55 이상인 게시물을 보여주세요. 힌트 : OR
+SELECT * FROM article WHERE nickname = '유저1' OR hit >= 55;
